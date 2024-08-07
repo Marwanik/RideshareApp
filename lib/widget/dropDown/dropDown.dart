@@ -1,33 +1,32 @@
 import 'package:flutter/material.dart';
 
 
-class CustomTextField extends StatelessWidget {
+class CustomDropdown extends StatelessWidget {
   final String hintText;
-  final TextInputType keyboardType;
-  final bool obscureText;
+  final List<String> items;
 
-  const CustomTextField({
+  const CustomDropdown({
     Key? key,
     required this.hintText,
-    this.keyboardType = TextInputType.text,
-    this.obscureText = false,
-    required TextEditingController controller,
+    required this.items,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      keyboardType: keyboardType,
-      obscureText: obscureText,
+    return DropdownButtonFormField<String>(
       decoration: InputDecoration(
         hintText: hintText,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
         ),
       ),
+      items: items.map((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+      onChanged: (_) {},
     );
   }
 }
-
-
-

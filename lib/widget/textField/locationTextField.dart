@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 
-
-class CustomTextField extends StatelessWidget {
+class CustomLocationTextField extends StatelessWidget {
   final String hintText;
   final TextInputType keyboardType;
   final bool obscureText;
+  final IconData? leadingIcon;
+  final IconData? trailingIcon;
+  final TextEditingController controller;
 
-  const CustomTextField({
+  const CustomLocationTextField({
     Key? key,
     required this.hintText,
     this.keyboardType = TextInputType.text,
     this.obscureText = false,
-    required TextEditingController controller,
+    this.leadingIcon,
+    this.trailingIcon,
+    required this.controller,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: controller,
       keyboardType: keyboardType,
       obscureText: obscureText,
       decoration: InputDecoration(
@@ -24,10 +29,9 @@ class CustomTextField extends StatelessWidget {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
         ),
+        prefixIcon: leadingIcon != null ? Icon(leadingIcon) : null,
+        suffixIcon: trailingIcon != null ? Icon(trailingIcon) : null,
       ),
     );
   }
 }
-
-
-
