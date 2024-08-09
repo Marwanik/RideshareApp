@@ -43,7 +43,7 @@ class OfferItemListTile extends StatelessWidget {
         ),
         trailing: SizedBox(
           width: 100,
-          child: CustomButton(text: 'Collect', onPressed: (){})
+          child: CustomButton(text: 'Collect', onPressed: (){}, borderColor: Colors.green,)
 
           ),
         ),
