@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rideshare/bloc/auth_bloc.dart';
+import 'package:rideshare/config/serviceLocater.dart';
 import 'package:rideshare/pages/signUp/signupScreen.dart';
+import 'package:rideshare/repos/authRepo.dart';
 import 'package:rideshare/widget/button/mainButton.dart';
 import 'package:rideshare/widget/button/outlineButton.dart';
 
@@ -37,9 +41,17 @@ class WelcomePage extends StatelessWidget {
             CustomFilledButton(
               text: 'Create an account',
               onPressed: () {
-                Navigator.pushReplacement(
+                Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => signupScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider(
+                      create: (context) => AuthBloc(
+                        // Inject the AuthRepo from the service locator
+                        locater.get<AuthRepo>(),
+                      ),
+                      child: signupScreen(),
+                    ),
+                  ),
                 );
               },
             ),

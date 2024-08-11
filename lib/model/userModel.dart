@@ -1,24 +1,25 @@
 import 'dart:convert';
 
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 class UserModel {
   String? firstName;
   String? lastName;
   String? phone;
   String? username;
   String? birthDate;
+  String? email; // Add email here
   String? password;
   String? confirmPassword;
+
   UserModel({
     this.firstName,
     this.lastName,
     this.phone,
     this.username,
     this.birthDate,
+    this.email, // Add email here
     this.password,
     this.confirmPassword,
   });
-
 
   UserModel copyWith({
     String? firstName,
@@ -26,6 +27,7 @@ class UserModel {
     String? phone,
     String? username,
     String? birthDate,
+    String? email, // Add email here
     String? password,
     String? confirmPassword,
   }) {
@@ -35,6 +37,7 @@ class UserModel {
       phone: phone ?? this.phone,
       username: username ?? this.username,
       birthDate: birthDate ?? this.birthDate,
+      email: email ?? this.email, // Add email here
       password: password ?? this.password,
       confirmPassword: confirmPassword ?? this.confirmPassword,
     );
@@ -47,6 +50,7 @@ class UserModel {
       'phone': phone,
       'username': username,
       'birthDate': birthDate,
+      'email': email, // Add email here
       'password': password,
       'confirmPassword': confirmPassword,
     };
@@ -59,6 +63,7 @@ class UserModel {
       phone: map['phone'] != null ? map['phone'] as String : null,
       username: map['username'] != null ? map['username'] as String : null,
       birthDate: map['birthDate'] != null ? map['birthDate'] as String : null,
+      email: map['email'] != null ? map['email'] as String : null, // Add email here
       password: map['password'] != null ? map['password'] as String : null,
       confirmPassword: map['confirmPassword'] != null ? map['confirmPassword'] as String : null,
     );
@@ -70,31 +75,32 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(firstName: $firstName, lastName: $lastName, phone: $phone, username: $username, birthDate: $birthDate, password: $password, confirmPassword: $confirmPassword)';
+    return 'UserModel(firstName: $firstName, lastName: $lastName, phone: $phone, username: $username, birthDate: $birthDate, email: $email, password: $password, confirmPassword: $confirmPassword)';
   }
 
   @override
   bool operator ==(covariant UserModel other) {
     if (identical(this, other)) return true;
 
-    return
-      other.firstName == firstName &&
-          other.lastName == lastName &&
-          other.phone == phone &&
-          other.username == username &&
-          other.birthDate == birthDate &&
-          other.password == password &&
-          other.confirmPassword == confirmPassword;
+    return other.firstName == firstName &&
+        other.lastName == lastName &&
+        other.phone == phone &&
+        other.username == username &&
+        other.birthDate == birthDate &&
+        other.email == email && 
+        other.password == password &&
+        other.confirmPassword == confirmPassword;
   }
 
   @override
   int get hashCode {
     return firstName.hashCode ^
-    lastName.hashCode ^
-    phone.hashCode ^
-    username.hashCode ^
-    birthDate.hashCode ^
-    password.hashCode ^
-    confirmPassword.hashCode;
+        lastName.hashCode ^
+        phone.hashCode ^
+        username.hashCode ^
+        birthDate.hashCode ^
+        email.hashCode ^ 
+        password.hashCode ^
+        confirmPassword.hashCode;
   }
 }
