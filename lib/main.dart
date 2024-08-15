@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rideshare/config/serviceLocater.dart';
 import 'package:rideshare/pages/home/homeScreen.dart';
 import 'package:rideshare/pages/onBoarding/onboardingScreen.dart';
+import 'package:rideshare/pages/signUp/signupScreen.dart';
 import 'package:rideshare/widget/button/mainButton.dart';
 import 'package:rideshare/widget/listTile/languageListTile.dart';
 
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
     debugShowCheckedModeBanner: false,
-      home:  OnboardingPage (),
+      home:  SignupScreen (),
     );
   }
 }
