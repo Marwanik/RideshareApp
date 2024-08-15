@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rideshare/bloc/auth_bloc.dart';
 import 'package:rideshare/config/serviceLocater.dart';
-import 'package:rideshare/pages/home/homeScreen.dart';
-import 'package:rideshare/pages/onBoarding/onboardingScreen.dart';
 import 'package:rideshare/pages/signUp/signupScreen.dart';
-import 'package:rideshare/widget/button/mainButton.dart';
-import 'package:rideshare/widget/listTile/languageListTile.dart';
 
-void main()  {
-  WidgetsFlutterBinding.ensureInitialized();
-   setupLocator();
-  runApp(const MyApp());
+void main() {
+  setupLocator(); // Initialize the service locator
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-    debugShowCheckedModeBanner: false,
-      home:  SignupScreen (),
+    return BlocProvider(
+      create: (context) => sl<AuthBloc>(), // Provide the AuthBloc using GetIt
+      child: MaterialApp(
+
+        home: SignupScreen(),
+      ),
     );
   }
 }
