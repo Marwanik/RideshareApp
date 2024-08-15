@@ -47,9 +47,9 @@ class WelcomePage extends StatelessWidget {
                     builder: (context) => BlocProvider(
                       create: (context) => AuthBloc(
                         // Inject the AuthRepo from the service locator
-                        locater.get<AuthRepo>(),
+                        sl.get<AuthRepo>(),
                       ),
-                      child: signupScreen(),
+                      child: SignupScreen(),
                     ),
                   ),
                 );

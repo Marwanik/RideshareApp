@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rideshare/pages/onBoarding/onboardingContent.dart';
 import 'package:rideshare/pages/welcome/welcomeScreen.dart';
 import 'package:rideshare/widget/button/onBoardingButton.dart';
-
+import 'package:rideshare/design/color.dart';
 class OnboardingPage extends StatefulWidget {
   @override
   _OnboardingPageState createState() => _OnboardingPageState();
@@ -50,7 +50,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       curve: Curves.ease,
                     );
                   },
-                  child: Text("Skip"),
+                  child: Text("Skip",style: TextStyle(color: Colors.black)),
                 ),
             ],
           ),

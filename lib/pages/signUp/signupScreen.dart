@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rideshare/bloc/auth_bloc.dart';
+import 'package:rideshare/bloc/auth_event.dart';
+import 'package:rideshare/bloc/auth_state.dart';
 import 'package:rideshare/model/userModel.dart';
 import 'package:rideshare/widget/button/mainButton.dart';
 import 'package:rideshare/widget/button/outlineButton.dart';
@@ -9,15 +11,18 @@ import 'package:rideshare/widget/dropDown/countrydropDown.dart';
 import 'package:rideshare/widget/dropDown/dropDown.dart';
 import 'package:rideshare/widget/textField/mainTextFiled.dart';
 
-class signupScreen extends StatefulWidget {
+class SignupScreen extends StatefulWidget {
   @override
-  _signupScreenState createState() => _signupScreenState();
+  _SignupScreenState createState() => _SignupScreenState();
 }
 
-class _signupScreenState extends State<signupScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   bool isChecked = false;
-  TextEditingController nameController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
+
+  TextEditingController userNameController = TextEditingController();
+  TextEditingController firstnameController = TextEditingController();
+  TextEditingController lastnameController = TextEditingController();
+  TextEditingController birthDateController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
@@ -37,21 +42,18 @@ class _signupScreenState extends State<signupScreen> {
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is Loading) {
-            // Show loading indicator
             showDialog(
               context: context,
               barrierDismissible: false,
               builder: (context) => Center(child: CircularProgressIndicator()),
             );
           } else if (state is Success) {
-            // Handle success scenario
-            Navigator.pop(context); // Close the loading dialog
+            Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Signup Successful')),
             );
           } else if (state is Failed) {
-            // Handle failure scenario
-            Navigator.pop(context); // Close the loading dialog
+            Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
             );
@@ -62,19 +64,30 @@ class _signupScreenState extends State<signupScreen> {
           child: ListView(
             children: [
               CustomTextField(
-                hintText: 'Name',
-                controller: nameController,
+                hintText: 'First Name',
+                controller: firstnameController,
               ),
               SizedBox(height: 16),
               CustomTextField(
-                hintText: 'Email',
-                keyboardType: TextInputType.emailAddress,
-                controller: emailController,
+                hintText: 'Last Name',
+                controller: lastnameController,
               ),
               SizedBox(height: 16),
               CustomCountryCodePicker(
                 hintText: 'Your mobile number',
                 Controller: phoneController,
+              ),
+              SizedBox(height: 16),
+              CustomTextField(
+                hintText: 'UserName',
+                keyboardType: TextInputType.name,
+                controller: userNameController,
+              ),
+              SizedBox(height: 16),
+              CustomTextField(
+                hintText: 'Birth Date',
+                keyboardType: TextInputType.text,
+                controller: birthDateController,
               ),
               SizedBox(height: 16),
               CustomTextField(
@@ -87,11 +100,6 @@ class _signupScreenState extends State<signupScreen> {
                 hintText: 'Confirm Password',
                 obscureText: true,
                 controller: confirmPasswordController,
-              ),
-              SizedBox(height: 16),
-              CustomDropdown(
-                hintText: 'Gender',
-                items: ['Male', 'Female', 'Other'],
               ),
               SizedBox(height: 16),
               CustomCheckbox(
@@ -111,31 +119,6 @@ class _signupScreenState extends State<signupScreen> {
                 },
               ),
               SizedBox(height: 16),
-              Divider(),
-              CustomOutlinedButton(
-                text: 'Sign up with Gmail',
-                icon: Icons.email,
-                onPressed: () {
-                  // Handle sign up with Gmail action
-                },
-              ),
-              SizedBox(height: 16),
-              CustomOutlinedButton(
-                text: 'Sign up with Facebook',
-                icon: Icons.facebook,
-                onPressed: () {
-                  // Handle sign up with Facebook action
-                },
-              ),
-              SizedBox(height: 16),
-              CustomOutlinedButton(
-                text: 'Sign up with Apple',
-                icon: Icons.apple,
-                onPressed: () {
-                  // Handle sign up with Apple action
-                },
-              ),
-              SizedBox(height: 16),
               TextButton(
                 onPressed: () {
                   // Handle sign in action
@@ -151,14 +134,15 @@ class _signupScreenState extends State<signupScreen> {
 
   void _onSignupButtonPressed(BuildContext context) {
     final user = UserModel(
-      firstName: nameController.text.trim(),
-      email: emailController.text.trim(),
+      firstName: firstnameController.text.trim(),
+      lastName: lastnameController.text.trim(),
       phone: phoneController.text.trim(),
+      username: userNameController.text.trim(),
+      birthDate: birthDateController.text.trim(),
       password: passwordController.text.trim(),
       confirmPassword: confirmPasswordController.text.trim(),
     );
 
-    // Dispatch signup event
     context.read<AuthBloc>().add(SignUp(user));
   }
 }

@@ -1,11 +1,12 @@
-part of 'auth_bloc.dart';
+
+import 'package:flutter/material.dart';
+import 'package:rideshare/model/userModel.dart';
 
 @immutable
-sealed class AuthEvent {}
+abstract class AuthEvent {}
 
 class SignUp extends AuthEvent {
   final UserModel user;
 
   SignUp(this.user);
-
 }

@@ -5,9 +5,9 @@ import 'package:rideshare/pages/onBoarding/onboardingScreen.dart';
 import 'package:rideshare/widget/button/mainButton.dart';
 import 'package:rideshare/widget/listTile/languageListTile.dart';
 
-void main() {
+void main()  {
   WidgetsFlutterBinding.ensureInitialized();
-  setup();
+   setupLocator();
   runApp(const MyApp());
 }
 
@@ -23,4 +23,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

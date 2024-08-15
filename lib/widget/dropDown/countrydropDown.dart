@@ -15,6 +15,7 @@ class CustomCountryCodePicker extends StatelessWidget {
     return Row(
       children: [
         Container(
+          height: 60,
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey),
             borderRadius: BorderRadius.circular(8),
@@ -22,8 +23,7 @@ class CustomCountryCodePicker extends StatelessWidget {
           child: Row(
             children: [
               SizedBox(width: 8),
-              Text('🇧🇩'),
-              Icon(Icons.arrow_drop_down),
+              Image.asset("assets/images/signUp/syria.png"),
               SizedBox(width: 8),
             ],
           ),

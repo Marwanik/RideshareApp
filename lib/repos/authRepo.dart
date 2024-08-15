@@ -1,6 +1,3 @@
-
-import 'package:rideshare/handling_error/handle_auth_message.dart';
-import 'package:rideshare/model/dataModel.dart';
 import 'package:rideshare/model/userModel.dart';
 import 'package:rideshare/service/authService.dart';
 
@@ -9,18 +6,33 @@ class AuthRepo {
 
   AuthRepo(this.authService);
 
-  Future<ResultModel> signUp(UserModel user) async {
+  Future<void> signUp(UserModel user) async {
     try {
-      var data = await authService.signup(user);
-      // ? Success Scenrio
-      return DataSuccess();
+      final token = await authService.signUp(user);
+
+      // Handle the token as required, e.g., saving it to storage
+      print('Signup successful, token: $token');
+
+      // Example:
+      // await saveToken(token);
+
     } catch (e) {
-      print(e.runtimeType);
-      if (e is PasswordHasNotSpeicalCharcter) {
-        return DataFailed(message: "Your Password must be retryed");
+      // Handle errors accordingly
+      if (e.toString().contains('Forbidden')) {
+        print('Signup failed: You do not have access to this resource.');
+        // Handle 403 Forbidden specifically
       } else {
-        return DataFailed(message: "The error is not Detect");
+        print('Signup failed: $e');
       }
+      throw Exception('Signup failed: $e');
     }
+  }
+
+  // Example method to save token (could be using SharedPreferences or another storage solution)
+  Future<void> saveToken(String token) async {
+    // Implement your token saving logic here
+    // For example, using SharedPreferences:
+    // final prefs = await SharedPreferences.getInstance();
+    // await prefs.setString('auth_token', token);
   }
 }
