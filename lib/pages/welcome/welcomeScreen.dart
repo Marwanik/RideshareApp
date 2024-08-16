@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rideshare/bloc/auth_bloc.dart';
+import 'package:rideshare/bloc/Login/AuthBlocLogin.dart';
+import 'package:rideshare/bloc/authBlocRegister.dart';
 import 'package:rideshare/config/serviceLocater.dart';
+import 'package:rideshare/pages/login/loginScreen.dart';
 import 'package:rideshare/pages/signUp/signupScreen.dart';
-import 'package:rideshare/repos/authRepo.dart';
+import 'package:rideshare/repos/AuthRepoLogin.dart';
+import 'package:rideshare/repos/AuthRepoRegister.dart';
 import 'package:rideshare/widget/button/mainButton.dart';
 import 'package:rideshare/widget/button/outlineButton.dart';
 
@@ -45,9 +48,9 @@ class WelcomePage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => BlocProvider(
-                      create: (context) => AuthBloc(
+                      create: (context) => AuthBlocRegister(
                         // Inject the AuthRepo from the service locator
-                        sl.get<AuthRepo>(),
+                        sl.get<AuthRepoRegister>(),
                       ),
                       child: SignupScreen(),
                     ),
@@ -59,7 +62,17 @@ class WelcomePage extends StatelessWidget {
             CustomOutlinedButton(
               text: 'Log In',
               onPressed: () {
-                // Handle log in action
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => BlocProvider(
+                        create: (context) => AuthBlocLogin(
+                    // Inject the AuthRepo from the service locator
+                    sl.get<AuthRepoLogin>(),
+                ),
+                child: LoginScreen(),
+                )));
+
               },
             ),
             Spacer(flex: 1),

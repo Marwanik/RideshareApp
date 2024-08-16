@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-class UserModel {
+class RegisterModel {
   String firstName;
   String lastName;
   String phone;
@@ -9,7 +9,7 @@ class UserModel {
   String password;
   String confirmPassword;
 
-  UserModel({
+  RegisterModel({
     required this.firstName,
     required this.lastName,
     required this.phone,

@@ -1,24 +1,24 @@
 import 'package:dio/dio.dart';
-import 'package:rideshare/model/userModel.dart';
+import 'package:rideshare/model/registerModel.dart';
 
-abstract class AuthService {
+abstract class AuthServiceRegister {
   final Dio dio;
 
-  AuthService(this.dio);
+  AuthServiceRegister(this.dio);
 
-  Future<String> signUp(UserModel user);
+  Future<String> signUp(RegisterModel user);
 }
 
-class AuthServiceImpl extends AuthService {
-  final String baseUrl = "https://rideshare.devscape.online/api/v1/auth/";
+class AuthServiceRegisterImpl extends AuthServiceRegister {
+  final String baseUrl = "https://rideshare.devscape.online/api/v1/";
 
-  AuthServiceImpl(Dio dio) : super(dio);
+  AuthServiceRegisterImpl(Dio dio) : super(dio);
 
   @override
-  Future<String> signUp(UserModel user) async {
+  Future<String> signUp(RegisterModel user) async {
     try {
       final response = await dio.post(
-        '${baseUrl}register',
+        '${baseUrl}auth/register',
         data: user.toJson(),
         options: Options(
           headers: {

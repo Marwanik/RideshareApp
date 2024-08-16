@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rideshare/bloc/auth_bloc.dart';
-import 'package:rideshare/bloc/auth_event.dart';
-import 'package:rideshare/bloc/auth_state.dart';
-import 'package:rideshare/model/userModel.dart';
+import 'package:rideshare/bloc/authBlocRegister.dart';
+import 'package:rideshare/bloc/authEventRegister.dart';
+import 'package:rideshare/bloc/authStateRegister.dart';
+import 'package:rideshare/model/registerModel.dart';
+import 'package:rideshare/pages/home/homeScreen.dart';
 import 'package:rideshare/widget/button/mainButton.dart';
 import 'package:rideshare/widget/button/outlineButton.dart';
 import 'package:rideshare/widget/checkBox/checkBox.dart';
@@ -30,39 +31,35 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Sign up with your email or phone number'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: BlocListener<AuthBloc, AuthState>(
+     
+      body: BlocListener<AuthBlocRegister, AuthStateRegister>(
         listener: (context, state) {
-          if (state is Loading) {
+          if (state is LoadingRegister) {
             showDialog(
               context: context,
               barrierDismissible: false,
               builder: (context) => Center(child: CircularProgressIndicator()),
             );
-          } else if (state is Success) {
-            Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Signup Successful')),
+          } else if (state is SuccessRegister) {
+            Navigator.pop(context); // Close the loading dialog
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomePage()),  // Navigate to HomePage
             );
-          } else if (state is Failed) {
-            Navigator.pop(context);
+          } else if (state is FailedRegister) {
+            Navigator.pop(context); // Close the loading dialog
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
             );
           }
         },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+        child:
+        Padding(
+          padding: const EdgeInsets.all(20.0),
           child: ListView(
             children: [
+
+              SizedBox(height: 50,),
               CustomTextField(
                 hintText: 'First Name',
                 controller: firstnameController,
@@ -133,7 +130,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void _onSignupButtonPressed(BuildContext context) {
-    final user = UserModel(
+    final user = RegisterModel(
       firstName: firstnameController.text.trim(),
       lastName: lastnameController.text.trim(),
       phone: phoneController.text.trim(),
@@ -143,6 +140,6 @@ class _SignupScreenState extends State<SignupScreen> {
       confirmPassword: confirmPasswordController.text.trim(),
     );
 
-    context.read<AuthBloc>().add(SignUp(user));
+    context.read<AuthBlocRegister>().add(SignUp(user));
   }
 }
