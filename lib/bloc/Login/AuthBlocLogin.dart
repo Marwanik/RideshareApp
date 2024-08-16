@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
 import 'package:rideshare/bloc/Login/AuthEventLogin.dart';
 import 'package:rideshare/bloc/Login/AuthStateLogin.dart';
 import 'package:rideshare/repos/AuthRepoLogin.dart';

@@ -1,12 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:rideshare/bloc/Hub/HubBloc.dart';
+import 'package:rideshare/bloc/Hub/HubStateBloc.dart';
 import 'package:rideshare/widget/button/customSmallButton.dart';
 import 'package:rideshare/widget/drawer/homeDrawer.dart';
 import 'package:rideshare/widget/textField/searchTextField.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final TextEditingController searchController = TextEditingController();
+  late MapController mapController;
+
+  @override
+  void initState() {
+    super.initState();
+    mapController = MapController();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Check if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled, handle appropriately
+      return;
+    }
+
+    // Check location permissions
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, handle appropriately
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are permanently denied, handle appropriately
+      return;
+    }
+
+    // Get current location
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    // Center the map on the current location
+    mapController.move(
+      LatLng(position.latitude, position.longitude),
+      13.0,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,27 +68,43 @@ class HomePage extends StatelessWidget {
       drawer: CustomDrawer(),
       body: Stack(
         children: [
-          FlutterMap(
-            options: MapOptions(
-              initialCenter: LatLng(33.5093553, 36.2939167),
-              initialZoom: 13.0,
-            ),
-            children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.example.app',
-              ),
-              MarkerLayer(
-                markers: [
-                  Marker(
-                    point: LatLng(33.5093553, 36.2939167),
-                    width: 80,
-                    height: 80,
-                    child:const Icon(Icons.location_pin, size: 40, color: Colors.red),
+          BlocBuilder<HubBloc, HubState>(
+            builder: (context, state) {
+              if (state is HubLoading) {
+                return Center(child: CircularProgressIndicator());
+              } else if (state is HubLoaded) {
+                return FlutterMap(
+                  mapController: mapController,
+                  options: MapOptions(
+                    initialCenter: LatLng(33.5093553, 36.2939167),
+                    initialZoom: 13.0,
                   ),
-                ],
-              ),
-            ],
+                  children: [
+                    TileLayer(
+                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.example.app',
+                    ),
+                    MarkerLayer(
+                      markers: state.hubs.map((hub) {
+                        return Marker(
+                          point: LatLng(hub.latitude, hub.longitude),
+                          width: 80,
+                          height: 80,
+                          child: const Icon(
+                            Icons.location_pin,
+                            size: 40,
+                            color: Colors.red,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                );
+              } else if (state is HubError) {
+                return Center(child: Text(state.message));
+              }
+              return Container();
+            },
           ),
           Positioned(
             top: 40,
@@ -74,35 +144,39 @@ class HomePage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.green),
                   ),
-                  child: Column(
+                  child: Row(
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: CustomButton(
-                              text: "Transport",
-                              onPressed: () {},
-                              color: Colors.green,
-                              textColor: Colors.white,
-                              borderColor: Colors.green,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: CustomButton(
-                              text: "Delivery",
-                              onPressed: () {},
-                              color: Colors.white,
-                              textColor: Colors.green,
-                              borderColor: Colors.green,
-                            ),
-                          ),
-                        ],
+                      Expanded(
+                        child: CustomButton(
+                          text: "Transport",
+                          onPressed: () {},
+                          color: Colors.green,
+                          textColor: Colors.white,
+                          borderColor: Colors.green,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: CustomButton(
+                          text: "Delivery",
+                          onPressed: () {},
+                          color: Colors.white,
+                          textColor: Colors.green,
+                          borderColor: Colors.green,
+                        ),
                       ),
                     ],
                   ),
                 ),
               ],
+            ),
+          ),
+          Positioned(
+            bottom: 80,
+            right: 16,
+            child: FloatingActionButton(
+              onPressed: _getCurrentLocation,
+              child: Icon(Icons.my_location),
             ),
           ),
         ],

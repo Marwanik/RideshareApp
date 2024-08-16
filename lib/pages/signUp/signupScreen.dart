@@ -6,10 +6,8 @@ import 'package:rideshare/bloc/authStateRegister.dart';
 import 'package:rideshare/model/registerModel.dart';
 import 'package:rideshare/pages/home/homeScreen.dart';
 import 'package:rideshare/widget/button/mainButton.dart';
-import 'package:rideshare/widget/button/outlineButton.dart';
 import 'package:rideshare/widget/checkBox/checkBox.dart';
 import 'package:rideshare/widget/dropDown/countrydropDown.dart';
-import 'package:rideshare/widget/dropDown/dropDown.dart';
 import 'package:rideshare/widget/textField/mainTextFiled.dart';
 
 class SignupScreen extends StatefulWidget {
