@@ -13,15 +13,16 @@ class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
-
 class _HomePageState extends State<HomePage> {
   final TextEditingController searchController = TextEditingController();
   late MapController mapController;
+  LatLng? userLocation; // Variable to store the user's current location
 
   @override
   void initState() {
     super.initState();
     mapController = MapController();
+    _getCurrentLocation(); // Fetch user's location as soon as the widget initializes
   }
 
   Future<void> _getCurrentLocation() async {
@@ -31,7 +32,9 @@ class _HomePageState extends State<HomePage> {
     // Check if location services are enabled
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled, handle appropriately
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Location services are disabled.'),
+      ));
       return;
     }
 
@@ -40,13 +43,17 @@ class _HomePageState extends State<HomePage> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, handle appropriately
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Location permissions are denied.'),
+        ));
         return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are permanently denied, handle appropriately
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Location permissions are permanently denied.'),
+      ));
       return;
     }
 
@@ -55,11 +62,16 @@ class _HomePageState extends State<HomePage> {
       desiredAccuracy: LocationAccuracy.high,
     );
 
-    // Center the map on the current location
-    mapController.move(
-      LatLng(position.latitude, position.longitude),
-      13.0,
-    );
+    // Update the userLocation variable and trigger a rebuild
+    setState(() {
+      userLocation = LatLng(position.latitude, position.longitude);
+
+      // Center the map on the current location
+      mapController.move(
+        userLocation!,
+        20.0,
+      );
+    });
   }
 
   @override
@@ -70,20 +82,34 @@ class _HomePageState extends State<HomePage> {
         children: [
           BlocBuilder<HubBloc, HubState>(
             builder: (context, state) {
-              if (state is HubLoading) {
-                return Center(child: CircularProgressIndicator());
-              } else if (state is HubLoaded) {
-                return FlutterMap(
-                  mapController: mapController,
-                  options: MapOptions(
-                    initialCenter: LatLng(33.5093553, 36.2939167),
-                    initialZoom: 13.0,
+              return FlutterMap(
+                mapController: mapController,
+                options: MapOptions(
+                  initialCenter: userLocation ?? LatLng(33.5093553, 36.2939167), // Default center if no location yet
+                  initialZoom: 13.0,
+                ),
+                children: [
+                  TileLayer(
+                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    userAgentPackageName: 'com.example.app',
                   ),
-                  children: [
-                    TileLayer(
-                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'com.example.app',
+                  if (userLocation != null) // Show marker for user's location
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          rotate: false,
+                          point: userLocation!,
+                          width: 80,
+                          height: 80,
+                          child: const Icon(
+                            Icons.location_on,
+                            size: 40,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ],
                     ),
+                  if (state is HubLoaded) // Show markers for hubs
                     MarkerLayer(
                       markers: state.hubs.map((hub) {
                         return Marker(
@@ -93,17 +119,13 @@ class _HomePageState extends State<HomePage> {
                           child: const Icon(
                             Icons.location_pin,
                             size: 40,
-                            color: Colors.red,
+                            color: Colors.green,
                           ),
                         );
                       }).toList(),
                     ),
-                  ],
-                );
-              } else if (state is HubError) {
-                return Center(child: Text(state.message));
-              }
-              return Container();
+                ],
+              );
             },
           ),
           Positioned(

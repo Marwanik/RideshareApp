@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        home: HomePage(),
+        home: WelcomePage(),
       ),
     );
   }
