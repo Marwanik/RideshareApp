@@ -1,6 +1,6 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rideshare/bloc/Hub/HubEventBloc.dart';
+import 'package:bloc/bloc.dart';
 import 'package:rideshare/bloc/Hub/HubStateBloc.dart';
+import 'package:rideshare/bloc/Hub/HubEventBloc.dart';
 import 'package:rideshare/repos/HubRepo.dart';
 
 class HubBloc extends Bloc<HubEvent, HubState> {

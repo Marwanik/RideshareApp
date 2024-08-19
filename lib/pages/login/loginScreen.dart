@@ -92,6 +92,6 @@ class _LoginScreenState extends State<LoginScreen> {
       password: passwordController.text.trim(),
     );
 
-    context.read<AuthBlocLogin>().add(Login(user));
+    context.read<AuthBlocLogin>().add(Login(user));  // Correctly pass LoginModel
   }
 }

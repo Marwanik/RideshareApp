@@ -7,11 +7,10 @@ class AuthRepoLogin {
 
   AuthRepoLogin(this.authService);
 
-  Future<void> login(LoginModel user) async {
+  Future<String> login(LoginModel user) async {  // Ensure this expects LoginModel and returns String
     try {
-      final token = await authService.login(user);
-      print('Login successful, token: $token');
-      // Example: await saveToken(token);
+      final token = await authService.login(user);  // Assume this returns a token as String
+      return token;  // Return the token
     } catch (e) {
       if (e is InvalidEmailOrPassword) {
         throw InvalidEmailOrPassword();

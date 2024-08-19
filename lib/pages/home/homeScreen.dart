@@ -4,73 +4,98 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:rideshare/bloc/Hub/HubBloc.dart';
+import 'package:rideshare/bloc/Hub/HubEventBloc.dart';
 import 'package:rideshare/bloc/Hub/HubStateBloc.dart';
-import 'package:rideshare/widget/button/customSmallButton.dart';
+import 'package:rideshare/bloc/Login/AuthBlocLogin.dart';
+import 'package:rideshare/bloc/Login/AuthStateLogin.dart';
 import 'package:rideshare/widget/drawer/homeDrawer.dart';
 import 'package:rideshare/widget/textField/searchTextField.dart';
+import 'package:flutter/scheduler.dart';
 
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
-class _HomePageState extends State<HomePage> {
+
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final TextEditingController searchController = TextEditingController();
   late MapController mapController;
-  LatLng? userLocation; // Variable to store the user's current location
+  LatLng? userLocation;
+  String searchQuery = '';
+  late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
     mapController = MapController();
-    _getCurrentLocation(); // Fetch user's location as soon as the widget initializes
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _animationController.forward();
+    });
+
+    // Listen for authentication state changes
+    BlocProvider.of<AuthBlocLogin>(context).stream.listen((state) {
+      if (state is SuccessLogin) {
+        _fetchHubs();
+      }
+    });
+
+    _initializeMap();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _initializeMap() async {
+    await _getCurrentLocation();
+    _fetchHubs();
   }
 
   Future<void> _getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) return;
 
-    // Check if location services are enabled
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Location services are disabled.'),
-      ));
-      return;
-    }
-
-    // Check location permissions
-    permission = await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Location permissions are denied.'),
-        ));
-        return;
-      }
+      if (permission == LocationPermission.denied) return;
     }
 
-    if (permission == LocationPermission.deniedForever) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Location permissions are permanently denied.'),
-      ));
-      return;
-    }
+    if (permission == LocationPermission.deniedForever) return;
 
-    // Get current location
     Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
     );
 
-    // Update the userLocation variable and trigger a rebuild
     setState(() {
       userLocation = LatLng(position.latitude, position.longitude);
+      mapController.move(userLocation!, 15.0);
+    });
+  }
 
-      // Center the map on the current location
-      mapController.move(
-        userLocation!,
-        20.0,
-      );
+  void _fetchHubs() {
+    final authBloc = BlocProvider.of<AuthBlocLogin>(context);
+    final authToken = authBloc.authToken;
+
+    if (authToken != null && userLocation != null) {
+      BlocProvider.of<HubBloc>(context).add(FetchHubs(
+        latitude: userLocation!.latitude,
+        longitude: userLocation!.longitude,
+        token: authToken,
+      ));
+    }
+  }
+
+  void _searchHubs(String query) {
+    setState(() {
+      searchQuery = query.toLowerCase();
     });
   }
 
@@ -82,10 +107,37 @@ class _HomePageState extends State<HomePage> {
         children: [
           BlocBuilder<HubBloc, HubState>(
             builder: (context, state) {
+              List<Marker> hubMarkers = [];
+              if (state is HubLoaded) {
+                // Print hubs to the console
+                for (var hub in state.hubs) {
+                  print('Hub: ${hub.name}, Location: (${hub.latitude}, ${hub.longitude})');
+                }
+
+                hubMarkers = state.hubs
+                    .where((hub) => hub.name.toLowerCase().contains(searchQuery))
+                    .map(
+                      (hub) => Marker(
+                    point: LatLng(hub.latitude, hub.longitude),
+                    width: 80,
+                    height: 80,
+                    child: ScaleTransition(
+                      scale: _animationController,
+                      child: const Icon(
+                        Icons.location_pin,
+                        size: 40,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
+                )
+                    .toList();
+              }
+
               return FlutterMap(
                 mapController: mapController,
                 options: MapOptions(
-                  initialCenter: userLocation ?? LatLng(33.5093553, 36.2939167), // Default center if no location yet
+                  initialCenter: userLocation ?? LatLng(33.5093553, 36.2939167),
                   initialZoom: 13.0,
                 ),
                 children: [
@@ -93,37 +145,24 @@ class _HomePageState extends State<HomePage> {
                     urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                     userAgentPackageName: 'com.example.app',
                   ),
-                  if (userLocation != null) // Show marker for user's location
+                  if (userLocation != null)
                     MarkerLayer(
                       markers: [
                         Marker(
-                          rotate: false,
                           point: userLocation!,
                           width: 80,
                           height: 80,
                           child: const Icon(
                             Icons.location_on,
                             size: 40,
-                            color: Colors.red,
+                            color: Colors.red, // Red pin for the user's location
                           ),
                         ),
                       ],
                     ),
-                  if (state is HubLoaded) // Show markers for hubs
-                    MarkerLayer(
-                      markers: state.hubs.map((hub) {
-                        return Marker(
-                          point: LatLng(hub.latitude, hub.longitude),
-                          width: 80,
-                          height: 80,
-                          child: const Icon(
-                            Icons.location_pin,
-                            size: 40,
-                            color: Colors.green,
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                  MarkerLayer(
+                    markers: hubMarkers, // Green pins for hubs
+                  ),
                 ],
               );
             },
@@ -154,76 +193,14 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 16),
                 CustomSearchField(
                   controller: searchController,
-                  hintText: "Where would you go?",
+                  hintText: "Search hubs...",
                   leadingIcon: Icons.search,
-                  trailingIcon: Icons.favorite,
+                  trailingIcon: Icons.clear,
+                  onChanged: _searchHubs,
                 ),
                 const SizedBox(height: 16),
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.green),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: CustomButton(
-                          text: "Transport",
-                          onPressed: () {},
-                          color: Colors.green,
-                          textColor: Colors.white,
-                          borderColor: Colors.green,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: CustomButton(
-                          text: "Delivery",
-                          onPressed: () {},
-                          color: Colors.white,
-                          textColor: Colors.green,
-                          borderColor: Colors.green,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
-          ),
-          Positioned(
-            bottom: 80,
-            right: 16,
-            child: FloatingActionButton(
-              onPressed: _getCurrentLocation,
-              child: Icon(Icons.my_location),
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favourite',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet),
-            label: 'Wallet',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_offer),
-            label: 'Offer',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
           ),
         ],
       ),
