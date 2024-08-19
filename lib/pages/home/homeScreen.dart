@@ -23,7 +23,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   LatLng? userLocation;
   String searchQuery = '';
   late AnimationController _animationController;
-
   @override
   void initState() {
     super.initState();
@@ -40,13 +39,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     // Listen for authentication state changes
     BlocProvider.of<AuthBlocLogin>(context).stream.listen((state) {
       if (state is SuccessLogin) {
-        _fetchHubs();
+        print('User logged in successfully.');
+        if (userLocation != null) {
+          _fetchHubs();  // Fetch hubs only if location is already available
+        }
       }
     });
 
-    _initializeMap();
+    // Initialize map and fetch hubs when both token and location are ready
+    _initializeMap().then((_) {
+      if (BlocProvider.of<AuthBlocLogin>(context).authToken != null) {
+        _fetchHubs();  // Fetch hubs only if token is already available
+      }
+    });
   }
-
   @override
   void dispose() {
     _animationController.dispose();
@@ -60,15 +66,24 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) return;
+    if (!serviceEnabled) {
+      print('Location services are disabled.');
+      return;
+    }
 
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) return;
+      if (permission == LocationPermission.denied) {
+        print('Location permissions are denied.');
+        return;
+      }
     }
 
-    if (permission == LocationPermission.deniedForever) return;
+    if (permission == LocationPermission.deniedForever) {
+      print('Location permissions are permanently denied.');
+      return;
+    }
 
     Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
@@ -78,18 +93,26 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       userLocation = LatLng(position.latitude, position.longitude);
       mapController.move(userLocation!, 15.0);
     });
+
+    print('User location: $userLocation');
   }
 
   void _fetchHubs() {
     final authBloc = BlocProvider.of<AuthBlocLogin>(context);
     final authToken = authBloc.authToken;
 
+    print('Auth token: $authToken');  // Print the token
+    print('User location: $userLocation');  // Print the location
+
     if (authToken != null && userLocation != null) {
+      print('Fetching hubs with token: $authToken and location: $userLocation');
       BlocProvider.of<HubBloc>(context).add(FetchHubs(
         latitude: userLocation!.latitude,
         longitude: userLocation!.longitude,
         token: authToken,
       ));
+    } else {
+      print('Cannot fetch hubs: authToken or userLocation is null.');
     }
   }
 
@@ -107,13 +130,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         children: [
           BlocBuilder<HubBloc, HubState>(
             builder: (context, state) {
+              if (state is HubLoading) {
+                print('Loading hubs...');
+              }
+
               List<Marker> hubMarkers = [];
               if (state is HubLoaded) {
-                // Print hubs to the console
-                for (var hub in state.hubs) {
-                  print('Hub: ${hub.name}, Location: (${hub.latitude}, ${hub.longitude})');
-                }
-
+                print('Hubs in HomePage: ${state.hubs}');
                 hubMarkers = state.hubs
                     .where((hub) => hub.name.toLowerCase().contains(searchQuery))
                     .map(
@@ -126,12 +149,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       child: const Icon(
                         Icons.location_pin,
                         size: 40,
-                        color: Colors.green,
+                        color: Colors.green, // Green pin for hubs
                       ),
                     ),
                   ),
                 )
                     .toList();
+              }
+
+              if (state is HubError) {
+                print('Error in HubBloc: ${state.message}');
               }
 
               return FlutterMap(
