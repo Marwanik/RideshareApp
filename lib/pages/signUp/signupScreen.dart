@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rideshare/bloc/authBlocRegister.dart';
-import 'package:rideshare/bloc/authEventRegister.dart';
-import 'package:rideshare/bloc/authStateRegister.dart';
+import 'package:rideshare/bloc/Register/authBlocRegister.dart';
+import 'package:rideshare/bloc/Register/authEventRegister.dart';
+import 'package:rideshare/bloc/Register/authStateRegister.dart';
 import 'package:rideshare/model/registerModel.dart';
 import 'package:rideshare/pages/home/homeScreen.dart';
 import 'package:rideshare/widget/button/mainButton.dart';

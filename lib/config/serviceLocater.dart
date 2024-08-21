@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:rideshare/bloc/Hub/HubBloc.dart';
 import 'package:rideshare/bloc/Login/AuthBlocLogin.dart';
-import 'package:rideshare/bloc/authBlocRegister.dart';
+import 'package:rideshare/bloc/Register/authBlocRegister.dart';
 
 import 'package:rideshare/repos/AuthRepoLogin.dart';
 import 'package:rideshare/repos/AuthRepoRegister.dart';

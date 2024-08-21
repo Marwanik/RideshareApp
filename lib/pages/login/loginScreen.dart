@@ -50,36 +50,43 @@ class _LoginScreenState extends State<LoginScreen> {
             );
           }
         },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ListView(
-            children: [
-              CustomTextField(
-                hintText: 'Phone',
-                keyboardType: TextInputType.phone,
-                controller: phoneController,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+                  CustomTextField(
+                    hintText: 'Phone',
+                    keyboardType: TextInputType.phone,
+                    controller: phoneController,
+                  ),
+                  SizedBox(height: 16),
+                  CustomTextField(
+                    hintText: 'Password',
+                    obscureText: true,
+                    controller: passwordController,
+                  ),
+                  SizedBox(height: 32),
+                  CustomFilledButton(
+                    text: 'Login',
+                    onPressed: () {
+                      _onLoginButtonPressed(context);
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      // Handle sign up action
+                    },
+                    child: Text('Don\'t have an account? Sign up'),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+                ],
               ),
-              SizedBox(height: 16),
-              CustomTextField(
-                hintText: 'Password',
-                obscureText: true,
-                controller: passwordController,
-              ),
-              SizedBox(height: 16),
-              CustomFilledButton(
-                text: 'Login',
-                onPressed: () {
-                  _onLoginButtonPressed(context);
-                },
-              ),
-              SizedBox(height: 16),
-              TextButton(
-                onPressed: () {
-                  // Handle sign up action
-                },
-                child: Text('Don\'t have an account? Sign up'),
-              ),
-            ],
+            ),
           ),
         ),
       ),

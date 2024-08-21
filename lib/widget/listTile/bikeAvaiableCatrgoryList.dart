@@ -35,8 +35,7 @@ class CarItemCategory extends StatelessWidget {
         children: [
           Row(
             children: [
-              Image.asset(imagePath, height: 50),
-              SizedBox(width: 16),
+
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,6 +63,8 @@ class CarItemCategory extends StatelessWidget {
                   ],
                 ),
               ),
+              Image.asset(imagePath, height: 50),
+              SizedBox(width: 16),
             ],
           ),
           SizedBox(height: 8),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rideshare/bloc/Login/AuthBlocLogin.dart';
-import 'package:rideshare/bloc/authBlocRegister.dart';
+import 'package:rideshare/bloc/Register/authBlocRegister.dart';
 import 'package:rideshare/config/serviceLocater.dart';
 import 'package:rideshare/pages/login/loginScreen.dart';
 import 'package:rideshare/pages/signUp/signupScreen.dart';

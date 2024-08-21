@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rideshare/pages/category/categoryChoose/chooseCategoryScreen.dart';
+import 'package:rideshare/pages/onBoarding/onboardingScreen.dart';
 import 'package:rideshare/pages/welcome/welcomeScreen.dart';
 import 'package:rideshare/repos/HubRepo.dart';
 import 'package:rideshare/bloc/Hub/HubBloc.dart';
@@ -28,7 +30,8 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        home: WelcomePage(),
+        debugShowCheckedModeBanner: false,
+        home: OnboardingPage(),
       ),
     );
   }

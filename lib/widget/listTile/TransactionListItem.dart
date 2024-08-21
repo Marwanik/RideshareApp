@@ -17,12 +17,13 @@ class TransactionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4.0),
-      padding: const EdgeInsets.all(8.0),
+      height: 75,
+      margin: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.only(bottom: 10,left: 10,right: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: Color(0xff08B783)),
       ),
       child: ListTile(
         leading: CircleAvatar(

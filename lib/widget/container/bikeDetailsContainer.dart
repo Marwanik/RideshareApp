@@ -23,26 +23,31 @@ class CarInfoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.green),
       ),
-      child: Row(
-        children: [
-          Image.asset(imagePath, height: 50),
-          SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                carName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Row(
-                children: [
-                  Icon(Icons.star, color: Colors.yellow),
-                  Text('$rating ($reviews reviews)'),
-                ],
-              ),
-            ],
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  carName,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Row(
+                  children: [
+                    Icon(Icons.star, color: Colors.yellow),
+                    Text('$rating ($reviews reviews)'),
+                  ],
+                ),
+              ],
+            ),
+            Image.asset(imagePath, height: 50),
+
+          ],
+        ),
       ),
     );
   }

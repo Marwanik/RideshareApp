@@ -13,13 +13,15 @@ class BalanceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      height: 150,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.green[50],
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.green),
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Text(
             amount,

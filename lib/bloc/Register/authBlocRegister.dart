@@ -1,7 +1,7 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rideshare/bloc/authEventRegister.dart';
-import 'package:rideshare/bloc/authStateRegister.dart';
+import 'package:rideshare/bloc/Register/authEventRegister.dart';
+import 'package:rideshare/bloc/Register/authStateRegister.dart';
 import 'package:rideshare/repos/AuthRepoRegister.dart';
 
 class AuthBlocRegister extends Bloc<AuthEventRegister, AuthStateRegister> {

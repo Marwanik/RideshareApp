@@ -46,6 +46,7 @@ flutter:
   assets:
      - assets/images/onBoarding/
      - assets/images/signUp/
+     - assets/images/category/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
