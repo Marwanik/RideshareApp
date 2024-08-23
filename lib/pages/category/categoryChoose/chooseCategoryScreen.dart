@@ -4,6 +4,8 @@ import 'package:rideshare/bloc/Login/AuthBlocLogin.dart';
 import 'package:rideshare/bloc/category/category_bloc.dart';
 import 'package:rideshare/bloc/category/category_event.dart';
 import 'package:rideshare/bloc/category/category_state.dart';
+import 'package:rideshare/pages/category/selectAvaiableBike/avaiableBikeScreen.dart';
+
 
 class SelectBiketScreen extends StatefulWidget {
   @override
@@ -70,7 +72,14 @@ class _SelectBiketScreenState extends State<SelectBiketScreen> {
                             setState(() {
                               selectedCategory = category.name;
                             });
-                            // Handle navigation to the next screen or actions
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AvailableBicyclesScreen(
+                                  category: category.name,
+                                ),
+                              ),
+                            );
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
@@ -85,7 +94,7 @@ class _SelectBiketScreenState extends State<SelectBiketScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
-                                  Icons.directions_bike, // Use a relevant icon
+                                  Icons.directions_bike,
                                   size: 50,
                                   color: isSelected ? Colors.green : Colors.black,
                                 ),

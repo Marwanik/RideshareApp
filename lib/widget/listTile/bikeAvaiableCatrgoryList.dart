@@ -1,24 +1,51 @@
 import 'package:flutter/material.dart';
 
-class CarItemCategory extends StatelessWidget {
-  final String carName;
-  final String carType;
-  final String seats;
-  final String fuelType;
-  final String distance;
-  final String imagePath;
+class BicycleItemCategory extends StatelessWidget {
+  final String model;
+  final double price;
+  final int size;
+  final String type;
+  final String photoPath;
+  final String note;
+  final List<String> maintenanceDetails;
   final VoidCallback onTap;
 
-  const CarItemCategory({
+  const BicycleItemCategory({
     Key? key,
-    required this.carName,
-    required this.carType,
-    required this.seats,
-    required this.fuelType,
-    required this.distance,
-    required this.imagePath,
+    required this.model,
+    required this.price,
+    required this.size,
+    required this.type,
+    required this.photoPath,
+    required this.note,
+    required this.maintenanceDetails,
     required this.onTap,
   }) : super(key: key);
+
+  void _showMaintenanceDetails(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Maintenance Details'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: maintenanceDetails.isEmpty
+                ? [Text('No maintenance details available')]
+                : maintenanceDetails.map((detail) => Text(detail)).toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,50 +62,66 @@ class CarItemCategory extends StatelessWidget {
         children: [
           Row(
             children: [
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      carName,
+                      model,
                       style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                     ),
                     SizedBox(height: 4),
                     Text(
-                      '$carType | $seats seats | $fuelType',
+                      'Price: \$$price | Size: $size \nType: $type',
                       style: TextStyle(color: Colors.grey),
                     ),
                     SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(Icons.location_on, color: Colors.grey, size: 16),
-                        SizedBox(width: 4),
-                        Text(
-                          distance,
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
+                    Text(
+                      'Note: $note',
+                      style: TextStyle(color: Colors.grey),
                     ),
                   ],
                 ),
               ),
-              Image.asset(imagePath, height: 50),
+              Image.network(
+                'https://$photoPath',
+                height: 100,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(Icons.image_not_supported);
+                },
+              ),
               SizedBox(width: 16),
             ],
           ),
           SizedBox(height: 8),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.green, backgroundColor: Colors.white,
-              side: BorderSide(color: Colors.green),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+          Row(
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.green, backgroundColor: Colors.white,
+                  side: BorderSide(color: Colors.green),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  minimumSize: Size(150, 36),
+                ),
+                onPressed: () => _showMaintenanceDetails(context),
+                child: Text('View Maintenance'),
               ),
-              minimumSize: Size(double.infinity, 36),
-            ),
-            onPressed: onTap,
-            child: Text('View car list'),
+              SizedBox(width: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.green, backgroundColor: Colors.white,
+                  side: BorderSide(color: Colors.green),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  minimumSize: Size(150, 36),
+                ),
+                onPressed: onTap,
+                child: Text('Select Bike'),
+              ),
+            ],
           ),
         ],
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rideshare/bloc/bisycle/bisycle_bloc.dart';
 import 'package:rideshare/bloc/category/category_bloc.dart';
 import 'package:rideshare/pages/category/categoryChoose/chooseCategoryScreen.dart';
 import 'package:rideshare/pages/onBoarding/onboardingScreen.dart';
@@ -30,7 +31,10 @@ class MyApp extends StatelessWidget {
           create: (context) => sl<HubBloc>(),
         ),
         BlocProvider(
-          create: (context) => CategoryBloc(sl<CategoryRepository>()),
+          create: (context) => sl<CategoryBloc>()
+        ),
+        BlocProvider(
+          create: (context) => sl<BicycleBloc>(), // Provide the BicycleBloc
         ),
       ],
       child: MaterialApp(
