@@ -3,13 +3,16 @@ import 'package:get_it/get_it.dart';
 import 'package:rideshare/bloc/Hub/HubBloc.dart';
 import 'package:rideshare/bloc/Login/AuthBlocLogin.dart';
 import 'package:rideshare/bloc/Register/authBlocRegister.dart';
+import 'package:rideshare/bloc/category/category_bloc.dart';
 
 import 'package:rideshare/repos/AuthRepoLogin.dart';
 import 'package:rideshare/repos/AuthRepoRegister.dart';
 import 'package:rideshare/repos/HubRepo.dart';
+import 'package:rideshare/repos/categoryRepo.dart';
 import 'package:rideshare/service/AuthServiceLogin.dart';
 import 'package:rideshare/service/HubService.dart';
 import 'package:rideshare/service/authServiceRegister.dart';
+import 'package:rideshare/service/categoryService.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -27,12 +30,14 @@ void setupLocator() {
   sl.registerLazySingleton<AuthRepoLogin>(() => AuthRepoLogin(sl<AuthServiceLogin>()));
   sl.registerFactory<AuthBlocLogin>(() => AuthBlocLogin(sl<AuthRepoLogin>()));
 
-  // Registering HubService with Dio
+  // Registering HubService
   sl.registerLazySingleton<HubService>(() => HubService(sl<Dio>()));
-
-  // Registering HubRepository with HubService
   sl.registerLazySingleton<HubRepository>(() => HubRepository(sl<HubService>()));
-
-  // Registering HubBloc with HubRepository
   sl.registerFactory<HubBloc>(() => HubBloc(sl<HubRepository>()));
+
+  // Registering Category
+
+  sl.registerLazySingleton<CategoryService>(() => CategoryService(sl<Dio>()));
+  sl.registerLazySingleton<CategoryRepository>(() => CategoryRepository(sl<CategoryService>()));
+  sl.registerFactory<CategoryBloc>(() => CategoryBloc(sl<CategoryRepository>()));
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rideshare/bloc/category/category_bloc.dart';
 import 'package:rideshare/pages/category/categoryChoose/chooseCategoryScreen.dart';
 import 'package:rideshare/pages/onBoarding/onboardingScreen.dart';
 import 'package:rideshare/pages/welcome/welcomeScreen.dart';
@@ -8,12 +9,12 @@ import 'package:rideshare/bloc/Hub/HubBloc.dart';
 import 'package:rideshare/pages/home/homeScreen.dart';
 import 'package:rideshare/bloc/Login/AuthBlocLogin.dart';
 import 'package:rideshare/config/serviceLocater.dart';
+import 'package:rideshare/repos/categoryRepo.dart';
 import 'package:rideshare/service/HubService.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   setupLocator();
-
   runApp(MyApp());
 }
 
@@ -27,6 +28,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => sl<HubBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => CategoryBloc(sl<CategoryRepository>()),
         ),
       ],
       child: MaterialApp(

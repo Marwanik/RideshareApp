@@ -8,6 +8,7 @@ import 'package:rideshare/bloc/Hub/HubEventBloc.dart';
 import 'package:rideshare/bloc/Hub/HubStateBloc.dart';
 import 'package:rideshare/bloc/Login/AuthBlocLogin.dart';
 import 'package:rideshare/bloc/Login/AuthStateLogin.dart';
+import 'package:rideshare/pages/category/categoryChoose/chooseCategoryScreen.dart';
 import 'package:rideshare/widget/button/customSmallButton.dart';
 import 'package:rideshare/widget/drawer/homeDrawer.dart';
 import 'package:rideshare/widget/textField/searchTextField.dart';
@@ -114,6 +115,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     });
   }
 
+  void _navigateToSelectBikeScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SelectBiketScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -133,10 +141,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       hub.description.toLowerCase().contains(searchQuery))
                       .map(
                         (hub) => Marker(
+                      rotate: true,
                       point: LatLng(hub.latitude, hub.longitude),
                       width: 120,
                       height: 80,
-                      child:  Column(
+                      child: Column(
                         children: [
                           ScaleTransition(
                             scale: _animationController,
@@ -177,6 +186,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       MarkerLayer(
                         markers: [
                           Marker(
+                            rotate: true,
                             point: userLocation!,
                             width: 80,
                             height: 80,
@@ -237,9 +247,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             Expanded(
                               child: CustomButton(
                                 text: 'Rental',
-                                onPressed: () {
-                                  // Handle rental action
-                                },
+                                onPressed: _navigateToSelectBikeScreen,
                                 borderColor: Colors.green,
                               ),
                             ),
@@ -258,48 +266,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           leadingIcon: Icons.search,
                           trailingIcon: Icons.favorite_border,
                           onChanged: _searchHubs, // Enable searching hubs
-                        ),
-                        const SizedBox(height: 16),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.green),
-                          ),
-                          child: TabBar(
-                            onTap: (index) {
-                              setState(() {
-                                selectedTabIndex = index;
-                              });
-                            },
-                            indicator: BoxDecoration(
-                              color: Colors.green,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            indicatorPadding: EdgeInsets.all(2.0),
-                            tabs: [
-                              Tab(
-                                child: Text(
-                                  'Transport',
-                                  style: TextStyle(
-                                    color: selectedTabIndex == 0
-                                        ? Colors.white
-                                        : Colors.grey,
-                                  ),
-                                ),
-                              ),
-                              Tab(
-                                child: Text(
-                                  'Delivery',
-                                  style: TextStyle(
-                                    color: selectedTabIndex == 1
-                                        ? Colors.white
-                                        : Colors.grey,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
                         ),
                       ],
                     ),

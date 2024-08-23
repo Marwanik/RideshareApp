@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:rideshare/pages/category/selectAvaiableBike/avaiableBikeScreen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rideshare/bloc/Login/AuthBlocLogin.dart';
+import 'package:rideshare/bloc/category/category_bloc.dart';
+import 'package:rideshare/bloc/category/category_event.dart';
+import 'package:rideshare/bloc/category/category_state.dart';
 
 class SelectBiketScreen extends StatefulWidget {
   @override
@@ -7,20 +11,23 @@ class SelectBiketScreen extends StatefulWidget {
 }
 
 class _SelectBiketScreenState extends State<SelectBiketScreen> {
-  String? selectedTransport;  // To keep track of the selected transport option
+  String? selectedCategory;
 
-  final List<Map<String, dynamic>> transportOptions = [
-    {"title": "Car", "icon": Icons.directions_car, "id": "car"},
-    {"title": "Bike", "icon": Icons.motorcycle, "id": "bike"},
-    {"title": "Cycle", "icon": Icons.directions_bike, "id": "cycle"},
-    {"title": "Taxi", "icon": Icons.local_taxi, "id": "taxi"},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    final authBloc = BlocProvider.of<AuthBlocLogin>(context);
+    final token = authBloc.authToken;
+    if (token != null) {
+      context.read<CategoryBloc>().add(FetchCategories(token: token));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Select transport'),
+        title: Text('Select Bicycle Category'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -34,7 +41,7 @@ class _SelectBiketScreenState extends State<SelectBiketScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Select your transport',
+              'Select your bicycle category',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -42,58 +49,65 @@ class _SelectBiketScreenState extends State<SelectBiketScreen> {
             ),
             SizedBox(height: 20),
             Expanded(
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16.0,
-                  mainAxisSpacing: 16.0,
-                ),
-                itemCount: transportOptions.length,
-                itemBuilder: (context, index) {
-                  final transport = transportOptions[index];
-                  final isSelected = selectedTransport == transport['id'];
-
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedTransport = transport['id'];
-                      });
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) =>CarSelectionScreen(),)
-                      );
-
-
-                    },
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        side: BorderSide(
-                          color: isSelected ? Colors.green : Colors.grey.shade300,
-                          width: 2,
-                        ),
+              child: BlocBuilder<CategoryBloc, CategoryState>(
+                builder: (context, state) {
+                  if (state is CategoryLoading) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (state is CategoryLoaded) {
+                    return GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16.0,
+                        mainAxisSpacing: 16.0,
                       ),
-                      color: isSelected ? Colors.green.shade50 : Colors.white,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            transport['icon'],
-                            size: 50,
-                            color: isSelected ? Colors.green : Colors.black,
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                            transport['title'],
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: isSelected ? Colors.green : Colors.black,
+                      itemCount: state.categories.length,
+                      itemBuilder: (context, index) {
+                        final category = state.categories[index];
+                        final isSelected = selectedCategory == category.name;
+
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedCategory = category.name;
+                            });
+                            // Handle navigation to the next screen or actions
+                          },
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                              side: BorderSide(
+                                color: isSelected ? Colors.green : Colors.grey.shade300,
+                                width: 2,
+                              ),
+                            ),
+                            color: isSelected ? Colors.green.shade50 : Colors.white,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.directions_bike, // Use a relevant icon
+                                  size: 50,
+                                  color: isSelected ? Colors.green : Colors.black,
+                                ),
+                                SizedBox(height: 10),
+                                Text(
+                                  category.name,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: isSelected ? Colors.green : Colors.black,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  );
+                        );
+                      },
+                    );
+                  } else if (state is CategoryError) {
+                    return Center(child: Text(state.message));
+                  } else {
+                    return Container(); // Should not reach here
+                  }
                 },
               ),
             ),
