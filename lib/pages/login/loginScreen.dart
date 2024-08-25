@@ -5,6 +5,7 @@ import 'package:rideshare/bloc/Login/AuthEventLogin.dart';
 import 'package:rideshare/bloc/Login/AuthStateLogin.dart';
 import 'package:rideshare/model/loginModel.dart';
 import 'package:rideshare/pages/home/homeScreen.dart';
+import 'package:rideshare/pages/signUp/signupScreen.dart';
 import 'package:rideshare/widget/button/mainButton.dart';
 import 'package:rideshare/widget/textField/mainTextFiled.dart';
 
@@ -77,11 +78,23 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () {
-                      // Handle sign up action
-                    },
-                    child: Text('Don\'t have an account? Sign up'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Don\'t have an account? '),
+
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SignupScreen(),
+                            ),
+                          );
+                        },
+                        child: Text("Sign up",style: TextStyle(color: Colors.green),),
+                      ),
+                    ],
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.1),
                 ],

@@ -20,12 +20,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-  final TextEditingController searchController = TextEditingController();
+  final TextEditingController searchControllerStart = TextEditingController();
+  final TextEditingController searchControllerDestination = TextEditingController();
   late MapController mapController;
   LatLng? userLocation;
-  String searchQuery = '';
+  LatLng? selectedHubLocation;
+  String searchQueryStart = '';
+  String searchQueryDestination = '';
   late AnimationController _animationController;
   int selectedTabIndex = 0;
+  bool locationRefreshed = false;
 
   @override
   void initState() {
@@ -65,7 +69,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Future<void> _initializeMap() async {
     await _getCurrentLocation();
-    _fetchHubs();
+    if (!locationRefreshed) {
+      _fetchHubs();
+    }
   }
 
   Future<void> _getCurrentLocation() async {
@@ -92,7 +98,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
     setState(() {
       userLocation = LatLng(position.latitude, position.longitude);
-      mapController.move(userLocation!, 15.0);
+      if (!locationRefreshed) {
+        mapController.move(userLocation!, 15.0);
+      }
     });
   }
 
@@ -109,9 +117,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
-  void _searchHubs(String query) {
+  void _searchHubs(String query, bool isStart) {
     setState(() {
-      searchQuery = query.toLowerCase();
+      if (isStart) {
+        searchQueryStart = query.toLowerCase();
+      } else {
+        searchQueryDestination = query.toLowerCase();
+      }
     });
   }
 
@@ -119,6 +131,37 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => SelectBiketScreen()),
+    );
+  }
+
+  double _calculateDistance(LatLng start, LatLng end) {
+    return Geolocator.distanceBetween(start.latitude, start.longitude, end.latitude, end.longitude) / 1000; // Returns distance in kilometers
+  }
+
+  void _showHubInfoDialog(String name, String description, double distance) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(name),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(description),
+              const SizedBox(height: 8),
+              Text('Distance: ${distance.toStringAsFixed(2)} km'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -137,38 +180,45 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 if (state is HubLoaded) {
                   hubMarkers = state.hubs
                       .where((hub) =>
-                  hub.name.toLowerCase().contains(searchQuery) ||
-                      hub.description.toLowerCase().contains(searchQuery))
-                      .map(
-                        (hub) => Marker(
+                  hub.name.toLowerCase().contains(searchQueryStart) ||
+                      hub.name.toLowerCase().contains(searchQueryDestination))
+                      .map((hub) {
+                    final LatLng hubLocation = LatLng(hub.latitude, hub.longitude);
+                    final distance = userLocation != null ? _calculateDistance(userLocation!, hubLocation) : 0.0;
+
+                    return Marker(
                       rotate: true,
-                      point: LatLng(hub.latitude, hub.longitude),
+                      point: hubLocation,
                       width: 120,
                       height: 80,
-                      child: Column(
-                        children: [
-                          ScaleTransition(
-                            scale: _animationController,
-                            child: const Icon(
-                              Icons.location_pin,
-                              size: 40,
-                              color: Colors.green,
+                      child: GestureDetector(
+                        onTap: () {
+                          _showHubInfoDialog(hub.name, hub.description, distance);
+                        },
+                        child: Column(
+                          children: [
+                            ScaleTransition(
+                              scale: _animationController,
+                              child: const Icon(
+                                Icons.location_pin,
+                                size: 40,
+                                color: Colors.green,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            hub.name,
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontWeight: FontWeight.bold,
+                            const SizedBox(height: 4),
+                            Text(
+                              "${hub.name} ",
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  )
-                      .toList();
+                    );
+                  }).toList();
                 }
 
                 return FlutterMap(
@@ -190,7 +240,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             point: userLocation!,
                             width: 80,
                             height: 80,
-                            child: const Icon(
+                           child: const Icon(
                               Icons.location_on,
                               size: 40,
                               color: Colors.red,
@@ -231,46 +281,60 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               bottom: 16,
               left: 16,
               right: 16,
-              child: Column(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.green[50],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.green),
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CustomButton(
-                                text: 'Rental',
-                                onPressed: _navigateToSelectBikeScreen,
-                                borderColor: Colors.green,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.green[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.green),
+                      ),
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: CustomButton(
+                                  text: 'Rental',
+                                  onPressed: _navigateToSelectBikeScreen,
+                                  borderColor: Colors.green,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            IconButton(
-                              icon: Icon(Icons.my_location),
-                              onPressed: _initializeMap,
-                              color: Colors.green,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        CustomSearchField(
-                          controller: searchController,
-                          hintText: "Where would you go?",
-                          leadingIcon: Icons.search,
-                          trailingIcon: Icons.favorite_border,
-                          onChanged: _searchHubs, // Enable searching hubs
-                        ),
-                      ],
+                              const SizedBox(width: 8),
+                              IconButton(
+                                icon: Icon(Icons.my_location),
+                                onPressed: () {
+                                  setState(() {
+                                    locationRefreshed = true;
+                                  });
+                                },
+                                color: Colors.green,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          CustomSearchField(
+                            controller: searchControllerStart,
+                            hintText: "Enter starting hub",
+                            leadingIcon: Icons.search,
+                            trailingIcon: Icons.clear,
+                            onChanged: (query) => _searchHubs(query, true),
+                          ),
+                          const SizedBox(height: 8),
+                          CustomSearchField(
+                            controller: searchControllerDestination,
+                            hintText: "Enter destination hub",
+                            leadingIcon: Icons.search,
+                            trailingIcon: Icons.clear,
+                            onChanged: (query) => _searchHubs(query, false),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
