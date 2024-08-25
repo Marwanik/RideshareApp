@@ -24,7 +24,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final TextEditingController searchControllerDestination = TextEditingController();
   late MapController mapController;
   LatLng? userLocation;
-  LatLng? selectedHubLocation;
+  LatLng? selectedHubStartLocation;
+  LatLng? selectedHubDestinationLocation;
   String searchQueryStart = '';
   String searchQueryDestination = '';
   late AnimationController _animationController;
@@ -167,6 +168,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    double distanceBetweenHubs = 0.0;
+
+    if (selectedHubStartLocation != null && selectedHubDestinationLocation != null) {
+      distanceBetweenHubs = _calculateDistance(selectedHubStartLocation!, selectedHubDestinationLocation!);
+    }
+
     return DefaultTabController(
       length: 2,
       initialIndex: selectedTabIndex,
@@ -177,6 +184,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             BlocBuilder<HubBloc, HubState>(
               builder: (context, state) {
                 List<Marker> hubMarkers = [];
+                List<LatLng> polylinePoints = [];
+
                 if (state is HubLoaded) {
                   hubMarkers = state.hubs
                       .where((hub) =>
@@ -191,8 +200,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       point: hubLocation,
                       width: 120,
                       height: 80,
-                      child: GestureDetector(
+                     child: GestureDetector(
                         onTap: () {
+                          if (searchQueryStart.isNotEmpty && searchQueryDestination.isEmpty) {
+                            setState(() {
+                              selectedHubStartLocation = hubLocation;
+                            });
+                          } else if (searchQueryDestination.isNotEmpty) {
+                            setState(() {
+                              selectedHubDestinationLocation = hubLocation;
+                            });
+                          }
                           _showHubInfoDialog(hub.name, hub.description, distance);
                         },
                         child: Column(
@@ -219,6 +237,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       ),
                     );
                   }).toList();
+
+                  if (selectedHubStartLocation != null && selectedHubDestinationLocation != null) {
+                    polylinePoints = [selectedHubStartLocation!, selectedHubDestinationLocation!];
+                  }
                 }
 
                 return FlutterMap(
@@ -240,7 +262,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             point: userLocation!,
                             width: 80,
                             height: 80,
-                           child: const Icon(
+                          child: const Icon(
                               Icons.location_on,
                               size: 40,
                               color: Colors.red,
@@ -251,6 +273,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     MarkerLayer(
                       markers: hubMarkers,
                     ),
+                    if (polylinePoints.isNotEmpty)
+                      PolylineLayer(
+                        polylines: [
+                          Polyline(
+                            points: polylinePoints,
+                            strokeWidth: 4.0,
+                            color: Colors.blue,
+                          ),
+                        ],
+                      ),
                   ],
                 );
               },
@@ -330,6 +362,46 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             trailingIcon: Icons.clear,
                             onChanged: (query) => _searchHubs(query, false),
                           ),
+                          const SizedBox(height: 8),
+                          if (distanceBetweenHubs > 0)
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      // Do something when pressed
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.green,
+                                      backgroundColor: Colors.white,
+                                      side: BorderSide(color: Colors.green),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Calculate Distance',
+                                      style: TextStyle(color: Colors.green),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.green),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    '${distanceBetweenHubs.toStringAsFixed(2)} km',
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                         ],
                       ),
                     ),

@@ -8,6 +8,7 @@ import 'package:rideshare/pages/home/homeScreen.dart';
 import 'package:rideshare/pages/signUp/signupScreen.dart';
 import 'package:rideshare/widget/button/mainButton.dart';
 import 'package:rideshare/widget/textField/mainTextFiled.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -31,18 +32,15 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
       body: BlocListener<AuthBlocLogin, AuthStateLogin>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is LoadingLogin) {
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) => Center(child: CircularProgressIndicator()),
-            );
+            _showLoadingDialog(context);
           } else if (state is SuccessLogin) {
+            await _saveUserSession(state.token); // Save the auth token
             Navigator.pop(context); // Close the loading dialog
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomePage()),  // Navigate to HomePage
+              MaterialPageRoute(builder: (context) => HomePage()),
             );
           } else if (state is FailedLogin) {
             Navigator.pop(context); // Close the loading dialog
@@ -82,7 +80,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('Don\'t have an account? '),
-
                       TextButton(
                         onPressed: () {
                           Navigator.push(
@@ -92,7 +89,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           );
                         },
-                        child: Text("Sign up",style: TextStyle(color: Colors.green),),
+                        child: Text(
+                          "Sign up",
+                          style: TextStyle(color: Colors.green),
+                        ),
                       ),
                     ],
                   ),
@@ -112,6 +112,19 @@ class _LoginScreenState extends State<LoginScreen> {
       password: passwordController.text.trim(),
     );
 
-    context.read<AuthBlocLogin>().add(Login(user));  // Correctly pass LoginModel
+    context.read<AuthBlocLogin>().add(Login(user));
+  }
+
+  Future<void> _saveUserSession(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('authToken', token); // Save the auth token in shared preferences
+  }
+
+  void _showLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(child: CircularProgressIndicator()),
+    );
   }
 }

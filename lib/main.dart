@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rideshare/bloc/bisycle/bisycle_bloc.dart';
 import 'package:rideshare/bloc/category/category_bloc.dart';
-import 'package:rideshare/pages/category/categoryChoose/chooseCategoryScreen.dart';
+import 'package:rideshare/pages/login/loginScreen.dart';
 import 'package:rideshare/pages/onBoarding/onboardingScreen.dart';
 import 'package:rideshare/pages/welcome/welcomeScreen.dart';
 import 'package:rideshare/repos/HubRepo.dart';
@@ -12,14 +12,23 @@ import 'package:rideshare/bloc/Login/AuthBlocLogin.dart';
 import 'package:rideshare/config/serviceLocater.dart';
 import 'package:rideshare/repos/categoryRepo.dart';
 import 'package:rideshare/service/HubService.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setupLocator();
-  runApp(MyApp());
+
+  final prefs = await SharedPreferences.getInstance();
+  final bool onboardingComplete = prefs.getBool('onboardingComplete') ?? false;
+
+  runApp(MyApp(showOnboarding: !onboardingComplete));
 }
 
 class MyApp extends StatelessWidget {
+  final bool showOnboarding;
+
+  MyApp({required this.showOnboarding});
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -31,7 +40,7 @@ class MyApp extends StatelessWidget {
           create: (context) => sl<HubBloc>(),
         ),
         BlocProvider(
-          create: (context) => sl<CategoryBloc>()
+          create: (context) => sl<CategoryBloc>(),
         ),
         BlocProvider(
           create: (context) => sl<BicycleBloc>(), // Provide the BicycleBloc
@@ -39,7 +48,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: OnboardingPage(),
+        home: showOnboarding ? OnboardingPage() : HomePage(),
       ),
     );
   }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rideshare/pages/onBoarding/onboardingContent.dart';
 import 'package:rideshare/pages/welcome/welcomeScreen.dart';
 import 'package:rideshare/widget/button/onBoardingButton.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingPage extends StatefulWidget {
   @override
@@ -51,7 +51,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       curve: Curves.ease,
                     );
                   },
-                  child: Text("Skip",style: TextStyle(color: Colors.black)),
+                  child: Text("Skip", style: TextStyle(color: Colors.black)),
                 ),
             ],
           ),
@@ -70,8 +70,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
           CircularProgressButton(
             icon: _currentPage == _buildPages().length - 1 ? null : Icons.arrow_forward,
             label: _currentPage == _buildPages().length - 1 ? 'Go' : '',
-            onPressed: () {
+            onPressed: () async {
               if (_currentPage == _buildPages().length - 1) {
+                await _completeOnboarding();
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => WelcomePage()),
@@ -89,5 +90,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
         ],
       ),
     );
+  }
+
+  Future<void> _completeOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('onboardingComplete', true);
   }
 }
