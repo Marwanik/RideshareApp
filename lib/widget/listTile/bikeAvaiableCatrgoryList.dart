@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rideshare/pages/category/avaiableBike/avaiableBikeScreen.dart';
 
 class BicycleItemCategory extends StatelessWidget {
   final String model;
@@ -118,7 +119,12 @@ class BicycleItemCategory extends StatelessWidget {
                   ),
                   minimumSize: Size(150, 36),
                 ),
-                onPressed: onTap,
+                onPressed :() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AvailableCarsScreen()),
+                  );
+                },
                 child: Text('Select Bike'),
               ),
             ],

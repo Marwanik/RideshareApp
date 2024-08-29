@@ -4,15 +4,15 @@ import 'package:rideshare/bloc/Login/AuthBlocLogin.dart';
 import 'package:rideshare/bloc/category/category_bloc.dart';
 import 'package:rideshare/bloc/category/category_event.dart';
 import 'package:rideshare/bloc/category/category_state.dart';
-import 'package:rideshare/pages/category/selectAvaiableBike/avaiableBikeScreen.dart';
+import 'package:rideshare/pages/category/selectAvaiableBike/selectAvaiableBikeScreen.dart';
 
 
-class SelectBiketScreen extends StatefulWidget {
+class SelectBikeScreen extends StatefulWidget {
   @override
   _SelectBiketScreenState createState() => _SelectBiketScreenState();
 }
 
-class _SelectBiketScreenState extends State<SelectBiketScreen> {
+class _SelectBiketScreenState extends State<SelectBikeScreen> {
   String? selectedCategory;
 
   @override

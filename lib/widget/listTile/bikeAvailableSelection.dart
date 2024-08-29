@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class CarItemSelection extends StatelessWidget {
@@ -38,7 +37,6 @@ class CarItemSelection extends StatelessWidget {
         children: [
           Row(
             children: [
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
