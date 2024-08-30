@@ -10,6 +10,7 @@ import 'package:rideshare/bloc/Login/AuthBlocLogin.dart';
 import 'package:rideshare/bloc/Login/AuthStateLogin.dart';
 import 'package:rideshare/model/hubModel.dart';
 import 'package:rideshare/pages/category/categoryChoose/chooseCategoryScreen.dart';
+import 'package:rideshare/pages/policys/policyScreen.dart';
 import 'package:rideshare/widget/button/customSmallButton.dart';
 import 'package:rideshare/widget/drawer/homeDrawer.dart';
 import 'package:rideshare/widget/textField/searchTextField.dart';
@@ -344,7 +345,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                   IconButton(
                     icon: Icon(Icons.notifications),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => PolicyScreen()),
+                      );
+
+                    },
                   ),
                 ],
               ),

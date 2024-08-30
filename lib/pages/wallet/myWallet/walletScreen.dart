@@ -54,7 +54,7 @@ class WalletScreen extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => WalletPage(),
+                            builder: (context) => WalletView(),
                           ));
                     },
                   ),
