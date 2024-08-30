@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rideshare/bloc/bisycle/bisycle_bloc.dart';
 import 'package:rideshare/bloc/category/category_bloc.dart';
+import 'package:rideshare/bloc/changePassword/change_password_bloc.dart';
 import 'package:rideshare/bloc/policy/policy_bloc.dart';
 import 'package:rideshare/bloc/wallet/wallet_bloc.dart';
 import 'package:rideshare/pages/login/loginScreen.dart';
@@ -52,6 +53,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => sl<PolicyBloc>(), // Add PolicyBloc provider
+        ),
+        BlocProvider(
+          create: (context) => sl<ChangePasswordBloc>(), // Add ChangePasswordBloc provider
         ),
       ],
       child: MaterialApp(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rideshare/pages/changePassword/changePasswordScreen.dart';
 import 'package:rideshare/pages/wallet/addAmount/addAmountScreen.dart';
 import 'package:rideshare/pages/wallet/createNewWallet/createWalletScreen.dart';
 import 'package:rideshare/widget/button/outlineButton.dart';
@@ -32,7 +33,11 @@ class WalletScreen extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.notifications, color: Colors.black),
             onPressed: () {
-              // Handle notification icon press
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChangePasswordScreen(),
+                  ));
             },
           ),
         ],
