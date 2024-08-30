@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rideshare/bloc/bisycle/bisycle_bloc.dart';
 import 'package:rideshare/bloc/category/category_bloc.dart';
+import 'package:rideshare/bloc/wallet/wallet_bloc.dart';
 import 'package:rideshare/pages/login/loginScreen.dart';
 import 'package:rideshare/pages/onBoarding/onboardingScreen.dart';
 import 'package:rideshare/pages/welcome/welcomeScreen.dart';
@@ -43,7 +44,10 @@ class MyApp extends StatelessWidget {
           create: (context) => sl<CategoryBloc>(),
         ),
         BlocProvider(
-          create: (context) => sl<BicycleBloc>(), // Provide the BicycleBloc
+          create: (context) => sl<BicycleBloc>(),
+        ),
+        BlocProvider(
+          create: (context) => sl<WalletBloc>(),
         ),
       ],
       child: MaterialApp(

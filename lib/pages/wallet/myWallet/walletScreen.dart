@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rideshare/pages/wallet/addAmount/addAmountScreen.dart';
+import 'package:rideshare/pages/wallet/createNewWallet/createWalletScreen.dart';
 import 'package:rideshare/widget/button/outlineButton.dart';
 import 'package:rideshare/widget/container/balanceCardContainer.dart';
 import 'package:rideshare/widget/drawer/homeDrawer.dart';
@@ -43,8 +44,22 @@ class WalletScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
+                Container(
+                  width: 175,
+                  child: CustomOutlinedButton(
+                    text: 'Create Wallet',
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => WalletPage(),
+                          ));
+                    },
+                  ),
+                ),
+
                 Container(
                   width: 175,
                   child: CustomOutlinedButton(
