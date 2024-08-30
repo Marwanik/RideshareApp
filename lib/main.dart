@@ -5,6 +5,7 @@ import 'package:rideshare/bloc/category/category_bloc.dart';
 import 'package:rideshare/bloc/changePassword/change_password_bloc.dart';
 import 'package:rideshare/bloc/policy/policy_bloc.dart';
 import 'package:rideshare/bloc/wallet/wallet_bloc.dart';
+import 'package:rideshare/new/pages/Splash/splashScreen.dart';
 import 'package:rideshare/pages/login/loginScreen.dart';
 import 'package:rideshare/pages/onBoarding/onboardingScreen.dart';
 import 'package:rideshare/pages/welcome/welcomeScreen.dart';
@@ -60,7 +61,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: showOnboarding ? OnboardingPage() : HomePage(),
+        home: showOnboarding ? OnboardingPage() : SplashScreen(),
       ),
     );
   }
