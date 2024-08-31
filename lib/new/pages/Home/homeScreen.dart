@@ -5,12 +5,20 @@ import 'package:rideshare/bloc/bisycle/bisycle_bloc.dart';
 import 'package:rideshare/bloc/bisycle/bisycle_event.dart';
 import 'package:rideshare/bloc/bisycle/bisycle_state.dart';
 import 'package:rideshare/model/bicycleModel.dart';
+import 'package:jwt_decoder/jwt_decoder.dart'; // Add this package in your pubspec.yaml
 
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authBloc = BlocProvider.of<AuthBlocLogin>(context);
     final token = authBloc.authToken; // Retrieve the token from AuthBlocLogin
+
+    if (token == null || JwtDecoder.isExpired(token)) {
+      // If token is null or expired, handle the situation (show login screen or error)
+      return _buildLoginPrompt(context);
+    }
+
+    print('Auth Token: $token'); // Print the token for debugging
 
     return Scaffold(
       body: Container(
@@ -35,14 +43,34 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildLoginPrompt(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('Your session has expired. Please log in again.'),
+          SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              // Navigate to login screen or perform re-authentication
+              Navigator.pushReplacementNamed(context, '/login');
+            },
+            child: Text('Log In'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildHeader(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 16.0),
       child: Row(
         children: [
           CircleAvatar(
+            backgroundColor: Colors.transparent,
             radius: 30,
-            backgroundImage: AssetImage('assets/images/profile.png'), // Add your profile image path
+            backgroundImage: AssetImage('assets/images/splash/Shape.png'), // Add your profile image path
           ),
           const SizedBox(width: 16),
           Column(
@@ -123,7 +151,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBicyclesSection(BuildContext context, String? token) {
+  Widget _buildBicyclesSection(BuildContext context, String token) {
     return Expanded(
       child: BlocBuilder<BicycleBloc, BicycleState>(
         builder: (context, state) {
@@ -135,9 +163,8 @@ class HomeScreen extends StatelessWidget {
             return Center(child: Text(state.message));
           } else {
             // Trigger fetching bicycles
-            if (token != null) {
-              context.read<BicycleBloc>().add(FetchBicyclesByCategory(token: token, category: ''));
-            }
+            print('Fetching bicycles...');
+            context.read<BicycleBloc>().add(FetchBicyclesByCategory(token: token, category: ''));
             return Center(child: CircularProgressIndicator());
           }
         },

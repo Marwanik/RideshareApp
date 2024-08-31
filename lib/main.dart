@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rideshare/bloc/Register/authBlocRegister.dart';
 import 'package:rideshare/bloc/bisycle/bisycle_bloc.dart';
 import 'package:rideshare/bloc/category/category_bloc.dart';
 import 'package:rideshare/bloc/changePassword/change_password_bloc.dart';
 import 'package:rideshare/bloc/policy/policy_bloc.dart';
 import 'package:rideshare/bloc/wallet/wallet_bloc.dart';
+import 'package:rideshare/new/pages/Home/homeScreen.dart';
 import 'package:rideshare/new/pages/Splash/splashScreen.dart';
 import 'package:rideshare/new/pages/login/login.dart';
 import 'package:rideshare/pages/login/loginScreen.dart';
@@ -39,6 +41,9 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
+          create: (context) => sl<AuthBlocRegister>()
+        ),
+        BlocProvider(
           create: (context) => sl<AuthBlocLogin>(),
         ),
         BlocProvider(
@@ -62,7 +67,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: showOnboarding ? OnboardingPage() : LoginSignupScreen(),
+        home: showOnboarding ? OnboardingPage() : HomeScreen(),
       ),
     );
   }

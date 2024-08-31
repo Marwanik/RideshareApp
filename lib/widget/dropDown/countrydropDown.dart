@@ -17,13 +17,13 @@ class CustomCountryCodePicker extends StatelessWidget {
         Container(
           height: 60,
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
+            border: Border.all(color: Colors.black),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             children: [
               SizedBox(width: 8),
-              Image.asset("assets/images/signUp/syria.png"),
+              Text("+963"),
               SizedBox(width: 8),
             ],
           ),
