@@ -4,19 +4,17 @@ import 'package:rideshare/bloc/Login/AuthBlocLogin.dart';
 import 'package:rideshare/bloc/wallet/wallet_bloc.dart';
 import 'package:rideshare/bloc/wallet/wallet_event.dart';
 import 'package:rideshare/bloc/wallet/wallet_state.dart';
+import 'package:rideshare/config/serviceLocater.dart';
 import 'package:rideshare/new/pages/login/login.dart';
-import 'package:rideshare/pages/policys/policyScreen.dart';
 import 'package:rideshare/pages/wallet/createNewWallet/createWalletScreen.dart';
+import 'package:rideshare/pages/changePassword/changePasswordScreen.dart'; // Import ChangePasswordScreen
+import 'package:rideshare/pages/policys/policyScreen.dart'; // Import PolicyScreen
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:get_it/get_it.dart';
-
-final GetIt sl = GetIt.instance;
 
 class CustomDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final authBloc = sl<AuthBlocLogin>(); // Using GetIt for AuthBlocLogin
-    final token = authBloc.authToken;
+    final token = sl<AuthBlocLogin>().authToken;
 
     return ClipRRect(
       borderRadius: BorderRadius.only(
@@ -27,14 +25,12 @@ class CustomDrawer extends StatelessWidget {
         backgroundColor: Colors.white,
         width: MediaQuery.of(context).size.width * .6,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with gradient background and profile
+            // Profile section with a gradient background
             Container(
               width: 300,
               padding: const EdgeInsets.symmetric(vertical: 40),
               decoration: BoxDecoration(
-
                 gradient: LinearGradient(
                   colors: [Color(0xFF009EFD), Color(0xFF2AF598)],
                   begin: Alignment.topCenter,
@@ -42,7 +38,6 @@ class CustomDrawer extends StatelessWidget {
                 ),
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   CircleAvatar(
                     radius: 40,
@@ -50,7 +45,7 @@ class CustomDrawer extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'John Doe', // Replace with dynamic user data if available
+                    'John Doe',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
@@ -62,12 +57,9 @@ class CustomDrawer extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 30),
-            // Drawer menu items
-            _buildDrawerItem(
-              context,
-              icon: Icons.wallet,
-              text: 'My Wallet',
+            // Drawer items
+            ListTile(
+              title: Text('My Wallet'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -75,61 +67,52 @@ class CustomDrawer extends StatelessWidget {
                 );
               },
             ),
-            _buildDivider(),
-            _buildDrawerItem(
-              context,
-              icon: Icons.report_problem,
-              text: 'My Statistics',
+            ListTile(
+              title: Text('Change Password'), // Change Password Option
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ChangePasswordScreen()), // Navigate to ChangePasswordScreen
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Privacy Policy'), // Privacy Policy Option
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PolicyScreen()), // Navigate to PolicyScreen
+                );
+              },
+            ),
+            ListTile(
+              title: Text('My Statistics'),
               onTap: () {
                 // Navigate to Statistics Screen
               },
             ),
-            _buildDivider(),
-            _buildDrawerItem(
-              context,
-              icon: Icons.card_giftcard,
-              text: 'Invite Friends',
+            ListTile(
+              title: Text('Invite Friends'),
               onTap: () {
                 // Navigate to Invite Friends Screen
               },
             ),
-            _buildDivider(),
-            _buildDrawerItem(
-              context,
-              icon: Icons.info,
-              text: 'Support',
+            ListTile(
+              title: Text('Support'),
               onTap: () {
                 // Navigate to Support Screen
               },
             ),
-            _buildDivider(),
-            _buildDrawerItem(
-              context,
-              icon: Icons.settings,
-              text: 'Settings',
+            ListTile(
+              title: Text('Settings'),
               onTap: () {
                 // Navigate to Settings Screen
               },
             ),
-            _buildDivider(),
-            _buildDrawerItem(
-              context,
-              icon: Icons.help,
-              text: 'Privacy Policy',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PolicyScreen()),
-                );
-              },
-            ),
-            _buildDivider(),
-            Spacer(),
-            // Logout item
-            _buildDrawerItem(
-              context,
-              icon: Icons.exit_to_app,
-              text: 'Logout',
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.logout),
+              title: Text('Log Out'),
               onTap: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 await prefs.clear(); // Clear all preferences
@@ -146,34 +129,11 @@ class CustomDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerItem(BuildContext context, {required IconData icon, required String text, required GestureTapCallback onTap}) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.black),
-      title: Text(
-        text,
-        style: TextStyle(
-          color: Colors.black,
-          fontFamily: 'Poppins',
-        ),
-      ),
-      onTap: onTap,
-    );
-  }
-
-  Widget _buildDivider() {
-    return Divider(color: Colors.grey);
-  }
-
   Widget _buildWalletBalance(BuildContext context, String? token) {
     if (token == null) {
-      return Text(
-        '\$0.00',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-      ); // Fallback balance if not loaded
+      return Text('\$0.00',
+          style: TextStyle(
+              color: Colors.white)); // Fallback balance if not loaded
     }
     return BlocProvider(
       create: (context) => sl<WalletBloc>()..add(FetchWalletEvent(token: token)),
@@ -191,14 +151,9 @@ class CustomDrawer extends StatelessWidget {
           } else if (state is WalletLoading) {
             return CircularProgressIndicator();
           } else {
-            return Text(
-              '\$0.00',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ); // Fallback balance if not loaded
+            return Text('\$0.00',
+                style: TextStyle(
+                    color: Colors.white)); // Fallback balance if not loaded
           }
         },
       ),
