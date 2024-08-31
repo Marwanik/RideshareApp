@@ -11,13 +11,14 @@ import 'package:rideshare/bloc/Login/AuthStateLogin.dart';
 import 'package:rideshare/bloc/wallet/wallet_bloc.dart';
 import 'package:rideshare/bloc/wallet/wallet_event.dart';
 import 'package:rideshare/bloc/wallet/wallet_state.dart';
-import 'package:rideshare/config/serviceLocater.dart';
+import 'package:rideshare/config/serviceLocater.dart' as serviceLocator; // Alias for service locator
 import 'package:rideshare/model/hubModel.dart';
 import 'package:rideshare/new/pages/login/login.dart';
 import 'package:rideshare/pages/category/categoryChoose/chooseCategoryScreen.dart';
 import 'package:rideshare/pages/policys/policyScreen.dart';
 import 'package:rideshare/pages/wallet/createNewWallet/createWalletScreen.dart';
 import 'package:rideshare/widget/button/customSmallButton.dart';
+import 'package:rideshare/widget/drawer/homeDrawer.dart' as homeDrawer; // Alias for homeDrawer import
 import 'package:rideshare/widget/drawer/homeDrawer.dart';
 import 'package:rideshare/widget/textField/searchTextField.dart';
 import 'package:flutter/scheduler.dart';

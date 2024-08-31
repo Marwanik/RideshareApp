@@ -21,6 +21,10 @@ class WalletView extends StatelessWidget {
       return _buildLoginPrompt(context);
     }
     return Scaffold(
+      appBar: AppBar(leading: IconButton(onPressed: () {
+        Navigator.of(context).pop();
+
+      }, icon: Icon(Icons.arrow_back),),),
       body: BlocConsumer<WalletBloc, WalletState>(
         listener: (context, state) {
           if (state is WalletError) {
