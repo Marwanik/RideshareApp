@@ -4,6 +4,7 @@ import 'package:rideshare/bloc/Register/authBlocRegister.dart';
 import 'package:rideshare/bloc/bisycle/bisycle_bloc.dart';
 import 'package:rideshare/bloc/category/category_bloc.dart';
 import 'package:rideshare/bloc/changePassword/change_password_bloc.dart';
+import 'package:rideshare/bloc/getBicycles/get_bicycles_bloc.dart';
 import 'package:rideshare/bloc/policy/policy_bloc.dart';
 import 'package:rideshare/bloc/wallet/wallet_bloc.dart';
 import 'package:rideshare/new/pages/Home/homeScreen.dart';
@@ -63,6 +64,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => sl<ChangePasswordBloc>(), // Add ChangePasswordBloc provider
+        ),
+        BlocProvider(
+          create: (context) => sl<GetBicycleBloc>(),
         ),
       ],
       child: MaterialApp(

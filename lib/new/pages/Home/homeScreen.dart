@@ -1,24 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rideshare/bloc/Login/AuthBlocLogin.dart';
-import 'package:rideshare/bloc/bisycle/bisycle_bloc.dart';
-import 'package:rideshare/bloc/bisycle/bisycle_event.dart';
-import 'package:rideshare/bloc/bisycle/bisycle_state.dart';
-import 'package:rideshare/model/bicycleModel.dart';
-import 'package:jwt_decoder/jwt_decoder.dart'; // Add this package in your pubspec.yaml
+import 'package:rideshare/bloc/getBicycles/get_bicycles_bloc.dart';
+import 'package:rideshare/bloc/getBicycles/get_bicycles_event.dart';
+import 'package:rideshare/bloc/getBicycles/get_bicycles_state.dart';
+import 'package:rideshare/model/getBicyclesModel.dart';
+import 'package:rideshare/new/pages/Map/mapScreen.dart';
+import 'package:rideshare/new/pages/Search/searchScreen.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authBloc = BlocProvider.of<AuthBlocLogin>(context);
     final token = authBloc.authToken; // Retrieve the token from AuthBlocLogin
-
-    if (token == null || JwtDecoder.isExpired(token)) {
-      // If token is null or expired, handle the situation (show login screen or error)
-      return _buildLoginPrompt(context);
-    }
-
-    print('Auth Token: $token'); // Print the token for debugging
 
     return Scaffold(
       body: Container(
@@ -35,29 +29,14 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           children: [
             _buildHeader(context),
+            const SizedBox(height: 16),
             _buildWeatherCard(),
-            _buildBicyclesSection(context, token),
+            const SizedBox(height: 16),
+            Expanded(
+              child: _buildBicyclesSection(context, token),
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildLoginPrompt(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('Your session has expired. Please log in again.'),
-          SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              // Navigate to login screen or perform re-authentication
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-            child: Text('Log In'),
-          ),
-        ],
       ),
     );
   }
@@ -94,10 +73,19 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
           Spacer(),
-          Icon(
-            Icons.search,
-            color: Colors.white,
-            size: 28,
+          IconButton(
+            icon: Icon(
+              Icons.search,
+              color: Colors.white,
+              size: 28,
+            ),
+            onPressed: () {
+              // Navigate to the SearchScreen
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => SearchPage()), // Navigate to SearchPage
+              // );
+            },
           ),
         ],
       ),
@@ -106,6 +94,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildWeatherCard() {
     return Container(
+      height: 200,
       margin: const EdgeInsets.symmetric(horizontal: 16.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
@@ -151,28 +140,27 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBicyclesSection(BuildContext context, String token) {
-    return Expanded(
-      child: BlocBuilder<BicycleBloc, BicycleState>(
-        builder: (context, state) {
-          if (state is BicycleLoading) {
-            return Center(child: CircularProgressIndicator());
-          } else if (state is BicycleLoaded) {
-            return _buildBicyclesList(state.bicycles);
-          } else if (state is BicycleError) {
-            return Center(child: Text(state.message));
-          } else {
-            // Trigger fetching bicycles
-            print('Fetching bicycles...');
-            context.read<BicycleBloc>().add(FetchBicyclesByCategory(token: token, category: ''));
-            return Center(child: CircularProgressIndicator());
+  Widget _buildBicyclesSection(BuildContext context, String? token) {
+    return BlocBuilder<GetBicycleBloc, GetBicycleState>(
+      builder: (context, state) {
+        if (state is GetBicycleLoading) {
+          return Center(child: CircularProgressIndicator());
+        } else if (state is GetBicycleLoaded) {
+          return _buildBicyclesList(context, state.bicycles); // Pass context here
+        } else if (state is GetBicycleError) {
+          return Center(child: Text(state.message));
+        } else {
+          // Trigger fetching bicycles
+          if (token != null) {
+            context.read<GetBicycleBloc>().add(GetFetchBicyclesEvent(token: token));
           }
-        },
-      ),
+          return Center(child: CircularProgressIndicator());
+        }
+      },
     );
   }
 
-  Widget _buildBicyclesList(List<BicycleModel> bicycles) {
+  Widget _buildBicyclesList(BuildContext context, List<GetBicycleModel> bicycles) { // Add context parameter
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -190,12 +178,17 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  // Navigate to the MapScreen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomePage()), // Navigate to MapPage
+                  );
+                },
                 child: const Text(
                   'Browse Map >',
                   style: TextStyle(
                     color: Colors.white,
-                    decoration: TextDecoration.underline,
                   ),
                 ),
               ),
@@ -215,30 +208,50 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBicycleCard(BicycleModel bicycle) {
+  Widget _buildBicycleCard(GetBicycleModel bicycle) {
     return Container(
-      width: 200,
+      width: 350,
+      height: 100,
       margin: const EdgeInsets.symmetric(horizontal: 8.0),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            spreadRadius: 2,
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.network(
-            'https://${bicycle.photoPath}',
-            height: 100,
-            fit: BoxFit.cover,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.network(
+              'https://${bicycle.photoPath}',
+              height: 200,
+              width: double.infinity,
+              fit: BoxFit.fill,
+            ),
           ),
           const SizedBox(height: 8),
-          Text(
-            'Distance 150m', // Example distance, calculate dynamically if needed
-            style: const TextStyle(
-              color: Color(0xFF009EFD),
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+            decoration: BoxDecoration(
+              color: Color(0xFF009EFD).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              'Distance 150m', // Example distance, calculate dynamically if needed
+              style: const TextStyle(
+                color: Color(0xFF009EFD),
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           const SizedBox(height: 8),
